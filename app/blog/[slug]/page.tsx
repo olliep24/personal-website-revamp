@@ -16,10 +16,14 @@ export default async function Page({
   const headings = getHeadings(slug);
  
   return (
-    <>
-      <Toc headings={headings} />
-      <Post /> 
-    </>
+    <div className="flex gap-8">
+      <div className="w-3/4">
+        <Post />
+      </div>
+      <div className="w-1/4 shrink-0 sticky top-6 self-start">
+        <Toc headings={headings} />
+      </div>
+    </div>
   )
 };
  
