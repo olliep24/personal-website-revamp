@@ -14,10 +14,17 @@ export default async function Page({
   const { slug } = await params
   const { default: Post } = await import(`@/app/markdown/blog-posts/${slug}.mdx`)
   const headings = getHeadings(slug);
+  const metadata = getMetadata(slug);
  
   return (
     <div className="flex gap-8">
       <div className="w-3/4">
+        <h1>
+          {metadata.title}
+        </h1>
+        <h2>
+          {metadata.date}
+        </h2>
         <Post />
       </div>
       <div className="w-1/4 shrink-0 sticky top-6 self-start">
@@ -26,30 +33,28 @@ export default async function Page({
     </div>
   )
 };
- 
+
 /**
- * Reads the markdown posts and adds them to the static params to create static routes. 
+ * Returns the metadata from the mdx file associated with the given slug.  
  */
-export function generateStaticParams() {
-  const dir = path.join(process.cwd(), 'app/markdown/blog-posts');
-  const files = fs.readdirSync(dir);
-  
-  const posts = files.map(f => {
-    const raw = fs.readFileSync(path.join(dir, f), 'utf-8');
-    const { data } = matter(raw);
-    return {
-      slug: data.slug,
-      title: data.title,
-      date: data.date,
-    };
-  });
+function getMetadata(slug: string) {
+  const raw = fs.readFileSync(
+    path.join(process.cwd(), `app/markdown/blog-posts/${slug}.mdx`),
+    'utf-8'
+  )
 
-  return posts.map(post => ({ slug: post.slug }))
-};
- 
-export const dynamicParams = false;
+  const { data } = matter(raw);
+  return {
+    slug: data.slug,
+    title: data.title,
+    date: data.date,
+  };
+}
 
-export function getHeadings(slug: string) {
+/**
+ * Retrieves the headings from the mdx file associated with the given slug.
+ */
+function getHeadings(slug: string) {
   // Use Github slugger because rehype-slug uses the same package.
   // This ensures that slugs generated here match in the rendered mdx.
   const slugger = new GithubSlugger()
@@ -73,3 +78,25 @@ export function getHeadings(slug: string) {
 
   return headings
 };
+
+/**
+ * Reads the markdown posts and adds them to the static params to create static routes. 
+ */
+export function generateStaticParams() {
+  const dir = path.join(process.cwd(), 'app/markdown/blog-posts');
+  const files = fs.readdirSync(dir);
+  
+  const posts = files.map(f => {
+    const raw = fs.readFileSync(path.join(dir, f), 'utf-8');
+    const { data } = matter(raw);
+    return {
+      slug: data.slug,
+      title: data.title,
+      date: data.date,
+    };
+  });
+
+  return posts.map(post => ({ slug: post.slug }))
+};
+
+export const dynamicParams = false;

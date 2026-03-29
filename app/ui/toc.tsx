@@ -24,7 +24,7 @@ export default function Toc({ headings }: TocParams) {
       <nav>
         <ul className="flex flex-col gap-1">
           <li key={"Top"} className="pl-0">
-            <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-zinc-800">
+            <a href="#" className="text-sm text-zinc-500">
               Top
             </a>
           </li>
@@ -32,7 +32,7 @@ export default function Toc({ headings }: TocParams) {
             <li key={heading.slug} className={depthPadding[heading.depth] ?? 'pl-0'}>
               <a
                 href={`#${heading.slug}`}
-                className="text-sm text-zinc-500 transition-colors hover:text-zinc-800"
+                className="text-sm text-zinc-500"
               >
                 {heading.text}
               </a>

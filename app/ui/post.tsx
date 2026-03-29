@@ -8,12 +8,15 @@ interface PostProps {
 
 export default function Post({ slug, title, date }: PostProps) {
   return (
-    <Link
-      href={`/blog/${slug}`}
-      className="group flex items-baseline gap-3 py-2 transition-opacity hover:opacity-60"
+    <div
+      className="flex items-baseline gap-3 py-2"
     >
       <span className="w-28 shrink-0 text-sm text-zinc-400">{date}</span>
-      <span className="text-zinc-800 group-hover:underline">{title}</span>
-    </Link>
+      <Link
+        href={`/blog/${slug}`}
+      >
+        <span className="text-zinc-800">{title}</span>
+      </Link>
+    </div>
   );
 }

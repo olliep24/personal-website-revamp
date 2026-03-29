@@ -6,7 +6,7 @@ export default function Nav() {
       <div className="mx-auto flex max-w-5xl flex-col items-start gap-3 px-6">
         <Link
           href="/"
-          className="text-3xl font-semibold text-zinc-800 transition-opacity hover:opacity-60"
+          className="text-3xl font-semibold text-zinc-800 no-underline"
         >
           Oliver Petrick
         </Link>
@@ -17,7 +17,7 @@ export default function Nav() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"
-            className="text-zinc-500 transition-opacity hover:opacity-60"
+            className="text-zinc-500"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -35,7 +35,7 @@ export default function Nav() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="LinkedIn"
-            className="text-zinc-500 transition-opacity hover:opacity-60"
+            className="text-zinc-500"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@ export default function Nav() {
           <a
             href="mailto:odpetrick@berkeley.edu"
             aria-label="Email"
-            className="text-zinc-500 transition-opacity hover:opacity-60"
+            className="text-zinc-500"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
