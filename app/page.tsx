@@ -3,6 +3,7 @@ import path from 'path';
 import matter from 'gray-matter';
 import Link from 'next/link';
 import Bio from '@/app/markdown/bio.mdx';
+import Post from './ui/post';
 
 export default function Home() {
   const dir = path.join(process.cwd(), 'app/markdown/blog-posts');
@@ -20,18 +21,16 @@ export default function Home() {
 
   return (
     <>
-      <Bio />
-      <div className="mx-auto max-w-3xl px-6 py-12 font-sans">
+      <div className="pr-84">
+        <Bio />
+      </div>
+      <h1 className="my-4 text-2xl">
+        Posts
+      </h1>
+      <div className="font-sans">
         <ul className="space-y-3">
           {posts.map(post => (
-            <li key={post.slug}>
-              <Link
-                href={`/blog/${post.slug}`}
-                className="text-zinc-700 transition-colors hover:text-zinc-900"
-              >
-                {post.title + post.date}
-              </Link>
-            </li>
+            <Post key={post.slug} slug={post.slug} title={post.title} date={post.date} />
           ))}
         </ul>
       </div>
