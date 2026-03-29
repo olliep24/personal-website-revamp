@@ -1,6 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import GithubSlugger from 'github-slugger';
+import {remark} from 'remark';
+import {visit} from 'unist-util-visit';
 
 export default async function Page({
   params,
@@ -34,3 +37,25 @@ export function generateStaticParams() {
 };
  
 export const dynamicParams = false;
+
+export function getHeadings(slug: string) {
+  const slugger = new GithubSlugger()
+  const raw = fs.readFileSync(
+    path.join(process.cwd(), `app/markdown/blog-posts/${slug}.mdx`),
+    'utf-8'
+  )
+
+  const tree = remark().parse(raw)
+  const headings: { text: string; slug: string; depth: number }[] = []
+
+  visit(tree, 'heading', (node: any) => {
+    const text = node.children.map((c: any) => c.value).join('')
+    headings.push({
+      text,
+      depth: node.depth,
+      slug: slugger.slug(text),
+    })
+  })
+
+  return headings
+};
