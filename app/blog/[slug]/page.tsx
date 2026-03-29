@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import matter from 'gray-matter';
 
 export default async function Page({
   params,
@@ -16,8 +17,20 @@ export default async function Page({
  * Reads the markdown posts and adds them to the static params to create static routes. 
  */
 export function generateStaticParams() {
-  const files = fs.readdirSync(path.join(process.cwd(), 'app/markdown/blog-posts'))
-  return files.map(f => ({ slug: f.replace('.mdx', '') }))
+  const dir = path.join(process.cwd(), 'app/markdown/blog-posts');
+  const files = fs.readdirSync(dir);
+  
+  const posts = files.map(f => {
+    const raw = fs.readFileSync(path.join(dir, f), 'utf-8');
+    const { data } = matter(raw);
+    return {
+      slug: data.slug,
+      title: data.title,
+      date: data.date,
+    };
+  });
+
+  return posts.map(post => ({ slug: post.slug }))
 };
  
 export const dynamicParams = false;
