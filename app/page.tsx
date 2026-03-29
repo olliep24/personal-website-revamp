@@ -25,7 +25,7 @@ export default function Home() {
       <div className="pr-84">
         <Bio />
       </div>
-      <h1 className="my-2 text-2xl">
+      <h1 className="my-2 text-3xl font-bold">
         Posts
       </h1>
       <div>
