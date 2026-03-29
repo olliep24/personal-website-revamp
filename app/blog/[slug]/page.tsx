@@ -20,15 +20,15 @@ export default async function Page({
     <div className="flex gap-8">
       <div className="w-3/4">
         <div className="my-8">
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-5xl font-bold">
             {metadata.title}
           </h1>
-          <h2 className="text-sm text-gray-400">
+          <h2 className="text-gray-400">
             {metadata.date}
           </h2>
           <hr className="my-2 border-gray-200" />
         </div>
-        <article className="prose">
+        <article className="prose max-w-none">
           <Post />
         </article>
       </div>
