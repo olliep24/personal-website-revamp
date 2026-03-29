@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
-import Link from 'next/link';
 import Bio from '@/app/markdown/bio.mdx';
 import Post from './ui/post';
 
@@ -29,7 +28,7 @@ export default function Home() {
       <h1 className="my-2 text-2xl">
         Posts
       </h1>
-      <div className="font-sans">
+      <div>
         <ul className="space-y-1">
           {posts.map(post => (
             <Post key={post.slug} slug={post.slug} title={post.title} date={post.date} />

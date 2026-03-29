@@ -17,19 +17,29 @@ const depthPadding: Record<number, string> = {
 
 export default function Toc({ headings }: TocParams) {
   return (
-    <nav>
-      <ul className="flex flex-col gap-1">
-        {headings.map((heading) => (
-          <li key={heading.slug} className={depthPadding[heading.depth] ?? 'pl-0'}>
-            <a
-              href={`#${heading.slug}`}
-              className="text-sm text-zinc-500 transition-colors hover:text-zinc-800"
-            >
-              {heading.text}
+    <>
+      <h1>
+        Content 
+      </h1> 
+      <nav>
+        <ul className="flex flex-col gap-1">
+          <li key={"Top"} className="pl-0">
+            <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-zinc-800">
+              Top
             </a>
           </li>
-        ))}
-      </ul>
-    </nav>
+          {headings.map((heading) => (
+            <li key={heading.slug} className={depthPadding[heading.depth] ?? 'pl-0'}>
+              <a
+                href={`#${heading.slug}`}
+                className="text-sm text-zinc-500 transition-colors hover:text-zinc-800"
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </>
   );
 };
