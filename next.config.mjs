@@ -11,7 +11,7 @@ const withMDX = createMDX({
   // Add markdown plugins here, as desired
   options: {
     remarkPlugins: ['remark-frontmatter'],
-    rehypePlugins: ['remark-slug'],
+    rehypePlugins: ['rehype-slug'],
   },
 })
  

@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import GithubSlugger from 'github-slugger';
 import {remark} from 'remark';
 import {visit} from 'unist-util-visit';
+import Toc from '@/app/ui/toc';
 
 export default async function Page({
   params,
@@ -12,8 +13,14 @@ export default async function Page({
 }) {
   const { slug } = await params
   const { default: Post } = await import(`@/app/markdown/blog-posts/${slug}.mdx`)
+  const headings = getHeadings(slug);
  
-  return <Post />
+  return (
+    <>
+      <Toc headings={headings} />
+      <Post /> 
+    </>
+  )
 };
  
 /**
@@ -39,13 +46,16 @@ export function generateStaticParams() {
 export const dynamicParams = false;
 
 export function getHeadings(slug: string) {
+  // Use Github slugger because rehype-slug uses the same package.
+  // This ensures that slugs generated here match in the rendered mdx.
   const slugger = new GithubSlugger()
   const raw = fs.readFileSync(
     path.join(process.cwd(), `app/markdown/blog-posts/${slug}.mdx`),
     'utf-8'
   )
 
-  const tree = remark().parse(raw)
+  const { content } = matter(raw)
+  const tree = remark().parse(content)
   const headings: { text: string; slug: string; depth: number }[] = []
 
   visit(tree, 'heading', (node: any) => {
