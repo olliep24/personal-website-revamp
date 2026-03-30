@@ -22,8 +22,11 @@ export default function Home() {
 
   return (
     <>
-      <div className="pr-84">
-        <Bio />
+      <div className="flex gap-8"> 
+        <div className="w-3/4">
+          <Bio />
+        </div>
+        <div className="w-1/4"></div>
       </div>
       <h1 className="my-2 text-3xl font-bold">
         Posts
