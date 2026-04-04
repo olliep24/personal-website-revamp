@@ -1,10 +1,23 @@
 import createMDX from '@next/mdx'
- 
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Allow .mdx extensions for files
   pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
-  // Optionally, add any other Next.js config below
+  turbopack: {
+    resolveAlias: {
+      env: './env-shim.js',
+    },
+  },
+  webpack: (config) => {
+    config.experiments = { ...config.experiments, asyncWebAssembly: true }
+    config.resolve.alias['env'] = path.resolve(__dirname, './env-shim.js')
+    return config
+  },
 }
  
 const withMDX = createMDX({
