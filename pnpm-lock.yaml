@@ -23,6 +23,9 @@ importers:
       '@types/mdx':
         specifier: ^2.0.13
         version: 2.0.13
+      firesim:
+        specifier: file:packages/firesim-0.1.0.tgz
+        version: file:packages/firesim-0.1.0.tgz
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
@@ -1303,6 +1306,10 @@ packages:
   find-up@5.0.0:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
+
+  firesim@file:packages/firesim-0.1.0.tgz:
+    resolution: {integrity: sha512-F8GJDCXvxfciV/XWMsB4KAXWR0zXGNOZlIYBAg2RUo3Ckm4MMTG1+qD7O9adHTHq0Z3HUQWM4QclWI8rQzPljQ==, tarball: file:packages/firesim-0.1.0.tgz}
+    version: 0.1.0
 
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
@@ -3783,6 +3790,8 @@ snapshots:
     dependencies:
       locate-path: 6.0.0
       path-exists: 4.0.0
+
+  firesim@file:packages/firesim-0.1.0.tgz: {}
 
   flat-cache@4.0.1:
     dependencies:
