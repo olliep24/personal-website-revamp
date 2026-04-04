@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 
-export default function FireSim() {
+export default function Firesim() {
   useEffect(() => {
     async function run() {
       await import("firesim");
