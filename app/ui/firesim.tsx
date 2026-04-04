@@ -1,7 +1,12 @@
 "use client";
 import { useEffect } from "react";
 
-export default function Firesim() {
+interface FiresimProps {
+  width: string;
+  height: string;
+}
+
+export default function Firesim({ width, height }: FiresimProps) {
   useEffect(() => {
     async function run() {
       await import("firesim");
@@ -9,5 +14,5 @@ export default function Firesim() {
     run();
   }, []);
 
-  return <canvas id="canvas" style={{ width: "32vw", height: "18vh" }} />;
+  return <canvas id="canvas" style={{ width, height }} />;
 }
