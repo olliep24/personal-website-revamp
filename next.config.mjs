@@ -18,24 +18,6 @@ const nextConfig = {
     config.resolve.alias['env'] = path.resolve(__dirname, './env-shim.js')
     return config
   },
-  // Enable SharedArrayBuffer for better wasm performance
-  async headers() {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "Cross-Origin-Opener-Policy",
-            value: "same-origin",
-          },
-          {
-            key: "Cross-Origin-Embedder-Policy",
-            value: "require-corp",
-          },
-        ],
-      },
-    ];
-  },
 }
  
 const withMDX = createMDX({
