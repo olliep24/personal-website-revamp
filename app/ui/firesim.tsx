@@ -8,6 +8,7 @@ interface FiresimProps {
 
 export default function Firesim({ width, height }: FiresimProps) {
   useEffect(() => {
+    // TODO: Update firesim wasm to a release build, not a debug build.
     async function run() {
       await import("firesim");
     }
