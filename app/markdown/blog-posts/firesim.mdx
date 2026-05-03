@@ -30,7 +30,17 @@ priority of mine. The alternative, grid based simulations, had more complexity f
 techniques were more straightforward and more familiar to me. Additionally, grid based simulations have been researched and implemented
 more.
 
-Grid based simulations model a velocity field $u(x, t)$
+Grid based simulations model a velocity vector field, $\mathbf{u}(\mathbf{x}, t)$, at discrete grid locations. Each grid cell contains 
+a vector representing the direction and speed of the fluid at that point in the simulation space.
+
+Image from nvidia paper
+
+Other scalar fields exist in our simulation like fuel, temperature, and smoke. These scalar fields are advected by the velocity field
+at each timestep of the simulation. Not only do these scalar quantities move through the vector field, but the vector field also 
+advects itself. This gives the fluid simulation the realistic look we're looking for, but adds more complexity that we will tackle next. 
+
+## The Navier Stokes Equations
+
 
 # Rendering and GPU Utilization
 
