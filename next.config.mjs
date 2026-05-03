@@ -23,8 +23,8 @@ const nextConfig = {
 const withMDX = createMDX({
   // Add markdown plugins here, as desired
   options: {
-    remarkPlugins: ['remark-frontmatter'],
-    rehypePlugins: ['rehype-slug'],
+    remarkPlugins: ['remark-frontmatter', 'remark-math'],
+    rehypePlugins: ['rehype-slug', 'rehype-katex'],
   },
 })
  

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "katex/dist/katex.min.css";
 import Nav from "./ui/nav";
 import { inter } from '@/app/ui/fonts';
 

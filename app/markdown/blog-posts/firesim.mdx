@@ -20,6 +20,18 @@ of my goals was to utilize the GPU and get some experience writing programs for 
 
 # Simulation
 
+## How do we simulate Fire?
+
+A common approach to the problem is to model the fire as a fluid with a buoyancy force greater than the gravitational force. While 
+researching the approaches for fire simulation, I came across two approaches: particle based simulations and grid based simulations. I 
+was initially drawn to a particle based simulation, specifically the position based fluids method developed by Macklin and Müller, but 
+this approach would leave me to learn more advanced rendering techniques to transform particles to have fire characteristics, which wasn't a 
+priority of mine. The alternative, grid based simulations, had more complexity for the simulation techniques, but the rendering
+techniques were more straightforward and more familiar to me. Additionally, grid based simulations have been researched and implemented
+more.
+
+Grid based simulations model a velocity field $u(x, t)$
+
 # Rendering and GPU Utilization
 
 # Try it out!
