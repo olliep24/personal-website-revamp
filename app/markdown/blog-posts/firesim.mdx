@@ -41,6 +41,61 @@ advects itself. This gives the fluid simulation the realistic look we're looking
 
 ## The Navier Stokes Equations
 
+The Navier Stokes Equations for incompressable flow describe how a fluid's vector field evolves over time at any given point.
+
+TODO: link imcompressible fluid above
+$$
+\frac{\partial \mathbf{u}}{\partial t} = -(\mathbf{u} \cdot \nabla)\mathbf{u} - \frac{1}{\rho}\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{f}
+\\
+\nabla \cdot \mathbf{u} = 0
+$$
+
+Although very imitating, this equation has been vastly simplified given our incompressability constraint, $\nabla \cdot \mathbf{u} = 0$,
+and we can connect each term to a physical concept.
+
+### Advection
+
+$$
+-(\mathbf{u} \cdot \nabla)\mathbf{u}
+$$
+
+As explained earlier, advection is defined as the velocity of the fluid moving objects, densities, and other values along the field. This term
+represents the velocity field advecting itself.
+
+### Pressure
+
+$$
+-\frac{1}{\rho}\nabla p
+$$
+
+Forces don't instantly propagate through a fluid. Each molecule close to the source of the force push on other molecules adjacent to
+them, and those particles push on other molecules adjacent to them, and so on. This is pressure build up and adds acceleration to the
+liquid. 
+
+### Diffusion
+
+$$
+\nu \nabla^2 \mathbf{u}
+$$
+
+There are different types of liquid, specifically those that vary in viscosity - honey moves much slower compared to water. This
+term represents how viscosity, or the ability for a fluid to resist flow, manipulates the velocity field.
+
+### External Forces
+
+$$
+\mathbf{f}
+$$
+
+This term represents any forces outside the fluid that affect its velocity field.
+
+## Assumptions and Constraints
+
+## Semi-Lagrangian Advection
+
+## Pressure Calculation
+
+## Fire and Smoke
 
 # Rendering and GPU Utilization
 
