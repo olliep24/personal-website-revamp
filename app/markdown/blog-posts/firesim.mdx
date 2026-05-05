@@ -126,6 +126,21 @@ simulation, but this will be readjusted with vorticity confinement later.
 
 ## Pressure Calculation
 
+Now that we solved discrete and parallelized method of advection, we now need to apply the external forces and pressure to the vector 
+field. Applying forces is straightforward, so I don't feel the need to talk about it, but pressure presents another story.
+
+After applying advection and the external forces to our vector field for a discrete timestamp, we are left with a new vector field 
+$u'$. This field isn't guaranteed to incompressable (have zero divergence). Luckily, the Helmholtz-Hodge decomposition will be helpful
+transforming a non-zero divergence vector field to a divergence free vector field.
+
+<Theorem name="Helmholtz-Hodge Decomposition">
+  Any vector field $\mathbf{u'}$ on space $D$ with normal $\mathbf{n}$ can be uniquely decomposed into the form:
+
+  $$\mathbf{u'} = \mathbf{u} + \nabla p$$
+
+  where $\nabla \cdot \mathbf{u} = 0$ and $u$ is parallel to $D$ i.e $\mathbf{u} \cdot \mathbf{n} = 0$.
+</Theorem>
+
 ## Fire and Smoke
 
 # Rendering and GPU Utilization
