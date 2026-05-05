@@ -91,7 +91,38 @@ This term represents any forces outside the fluid that affect its velocity field
 
 ## Assumptions and Constraints
 
+As mentioned earlier, incompressibility, $\nabla \cdot \mathbf{u} = 0$, is applied to the simulation. Additionally, this simulation will
+be inviscid, $\nu = 0$, so we don't have to consider the diffusion term. This is a beneficial trade off as fire visually has no viscosity.   
+
 ## Semi-Lagrangian Advection
+
+Relative to other concepts in fluid simulation, advection seems relatively straightforward, but it has some hidden nuances. A naive
+approach would be to apply Euler's method - just move whatever quantity at position given by $\mathbf{r}$ with input of time $t$ by
+the magnitude of the velocity at time $t$ scaled by the timestep.
+
+$$
+\mathbf{r}(t + \delta t) = \mathbf{r}(t) + \mathbf{u}(t) \delta t
+$$
+
+This approach is only stable in simulations with small timesteps, meaning the simulation will "blow up". Having a small timestamp
+is computationally expensive, which limits doing the simulation in real time. This presents another issue because we are utilizing
+the GPU with parallelization. A cell in our simulation grid will inevitably have two or more quantities converge on it,
+creating data races.
+
+The solution is to use a Semi-Lagrangian advection, an implicit method first introduce by Jos Stam in Stable Fluids, 1999. Instead,
+we backtrace where a quantity would be given the velocity, and move that quantity to the current position. To update a quantity $q$
+for each timestep, we follow:
+
+$$
+q(\mathbf{x}, t + \delta t) = q(\mathbf{x} - \mathbf{u}(t) \delta t, t)
+$$
+
+Where $q(\mathbf{x}, t)$ is the value of the quantity $q$ at position $\mathbf{x}$ at time $t$.
+
+TODO: Add nvidia picture here
+
+This solution is stable with any timestep and is easily parallelized on the GPU. Although, this solution adds dissipation to the
+simulation, but this will be readjusted with vorticity confinement later.
 
 ## Pressure Calculation
 
