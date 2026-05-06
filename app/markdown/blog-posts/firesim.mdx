@@ -141,6 +141,45 @@ transforming a non-zero divergence vector field to a divergence free vector fiel
   where $\nabla \cdot \mathbf{u} = 0$ and $u$ is parallel to $D$ i.e $\mathbf{u} \cdot \mathbf{n} = 0$.
 </Theorem>
 
+Let's define projection $\mathbb{P}$ that projects a vector field $u'$ onto it's divergence-free vector field $u$. If we apply that
+to the equation above, $\mathbb{P}\mathbf{u'} = \mathbb{P}\mathbf{u} + \mathbb{P}(\nabla p)$, and since by definition of $\mathbb{P}$,
+$\mathbb{P}\mathbf{u'} = \mathbb{P}\mathbf{u}$, we get that $\mathbb{P} (\nabla p) = 0$. Let's use these ideas with the Navier Stokes
+equation by applying the projection $\mathbb{P}$ to it.
+
+$$
+\mathbb{P}\frac{\partial \mathbf{u}}{\partial t} = \mathbb{P}(-(\mathbf{u} \cdot \nabla)\mathbf{u} - \frac{1}{\rho}\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{f})
+$$
+
+Because $u$ is divergence-free, so it the derivative on the left hand side, so $\mathbb{P}\frac{\partial \mathbf{u}}{\partial t} = \frac{\partial \mathbf{u}}{\partial t}$.
+Additionally, $\mathbb{P}(\nabla p) = 0$, so we're left with:
+
+$$
+\frac{\partial \mathbf{u}}{\partial t} = \mathbb{P}(-(\mathbf{u} \cdot \nabla)\mathbf{u} + \nu \nabla^2 \mathbf{u} + \mathbf{f})
+$$
+
+This is a great insight because to solve the equation for each time stamp, we need to self-advect the velocity field, apply diffusion
+(in our case we are skipping this), apply external forces, and apply the projection $\mathbb{P}$ to ensure that the next iteration is
+divergence-free. To apply the projection in practice we can reuse the equation from Helmholtz-Hodge decomposition again by
+applying the divergence operator to both sides.
+
+$$
+\nabla u' = \nabla \cdot (u + \nabla p) = \nabla u + \nabla^2 p \implies \nabla^2 p = \nabla \cdot w 
+$$
+
+Since $\nabla \cdot u = 0$. We have a Poisson equation that we can use to solve for pressure. A key insight to note:
+
+$$
+\frac{\partial \mathbf{u}}{\partial t} = \mathbb{P}(-(\mathbf{u} \cdot \nabla)\mathbf{u} + \nu \nabla^2 \mathbf{u} + \mathbf{f}) = -(\mathbf{u} \cdot \nabla)\mathbf{u} - \frac{1}{\rho}\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{f}
+$$
+
+Applying the acceleration from the pressure term is exactly what is keeping the velocity field divergence free. Using the
+Helmholtz-Hodge decomposition theorem, we have discovered how to calculate pressure from the divergent velocity field and use it
+to create a divergence-free velocity field.
+
+## Solving Poisson Equations
+
+## Vorticity Confinement
+
 ## Fire and Smoke
 
 # Rendering and GPU Utilization
