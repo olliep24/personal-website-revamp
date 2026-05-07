@@ -121,7 +121,7 @@ Where $q(\mathbf{x}, t)$ is the value of the quantity $q$ at position $\mathbf{x
 
 TODO: Add nvidia picture here
 
-This solution is stable with any timestep and is easily parallelized on the GPU. Although, this solution adds dissipation to the
+This solution is stable with any timestep and is easily parallelizable on the GPU. Although, this solution adds dissipation to the
 simulation, but this will be readjusted with vorticity confinement later.
 
 ## Pressure Calculation
@@ -160,7 +160,7 @@ $$
 This is a great insight because to solve the equation for each time stamp, we need to self-advect the velocity field, apply diffusion
 (in our case we are skipping this), apply external forces, and apply the projection $\mathbb{P}$ to ensure that the next iteration is
 divergence-free. To apply the projection in practice we can reuse the equation from Helmholtz-Hodge decomposition again by
-applying the divergence operator to both sides.
+applying the divergence operator to both sides:
 
 $$
 \nabla u' = \nabla \cdot (u + \nabla p) = \nabla u + \nabla^2 p \implies \nabla^2 p = \nabla \cdot w 
@@ -177,6 +177,39 @@ Helmholtz-Hodge decomposition theorem, we have discovered how to calculate press
 to create a divergence-free velocity field.
 
 ## Solving Poisson Equations
+
+All that is left now is to solve for pressure using the equation we defined above: 
+
+$$
+\nabla^2 p = \nabla \cdot w
+$$ 
+
+Since we are working with our discrete 3D grid, we need to use the finite difference form for the laplacian and divergence operator.
+
+$$
+\nabla^2 p_{i,j,k} = p_{i+1,j,k} + p_{i-1,j,k} + p_{i,j+1,k} + p_{i,j-1,k} + p_{i,j,k+1} + p_{i,j,k-1} - 6p_{i,j,k}
+$$
+
+$$
+(\nabla \cdot \mathbf{u'})_{i,j,k} = \frac{u'_{x,i+1,j,k} - u'_{x,i-1,j,k} + u'_{y,i,j+1,k} - u'_{y,i,j-1,k} + u'_{z,i,j,k+1} - u'_{z,i,j,k-1}}{2} = d
+$$
+
+This assumes that the difference between each grid is unit length (h = 1). Now we plug them in:
+
+$$
+p_{i+1,j,k} + p_{i-1,j,k} + p_{i,j+1,k} + p_{i,j-1,k} + p_{i,j,k+1} + p_{i,j,k-1} - 6p_{i,j,k} = d
+$$
+
+$$
+p_{i,j,k} = \frac{p_{i+1,j,k} + p_{i-1,j,k} + p_{i,j+1,k} + p_{i,j-1,k} + p_{i,j,k+1} + p_{i,j,k-1} - d}{6}
+$$
+
+We now have a linear equation with seven unknowns, but we want to solve for pressure at each of our $N^3$ grid locations. That
+leaves us with a system $N^3$ linear equations with $N^3$ unknowns because we want to solve for $i, j, k \in N^3$. It would take a
+lot of time to solve this system of linear equations exactly, so we can use the Jacobi method (which is well parallelized on the GPU) with $k=20$ iterations to find an
+approximate solution.
+
+We now fully have a way to calculate the change in our velocity field for a discrete time step in our simulation!
 
 ## Vorticity Confinement
 
