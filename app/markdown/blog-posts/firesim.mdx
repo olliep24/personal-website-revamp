@@ -213,7 +213,26 @@ We now fully have a way to calculate the change in our velocity field for a disc
 
 ## Vorticity Confinement
 
-Although we now have a stable simulation, we had to give up some things to achieve it.
+Although we now have a stable simulation, we had to give up some things to achieve it. Smoke, air, or any gas you can think of
+has circular flows that spiral like pinwheels, which is referred to as vorticity. Fedkiw et al. explained how numerical 
+dissipation caused by simulation on a coarse grid damps out these interesting features. The process of adding these visualizations
+back is referred to as vorticity confinement. To do so, we first calculate the vorticity of our field, $\omega = \nabla \times u$,
+and use that to normalized vorticity vector field:
+
+$$
+\Psi = \frac{\eta}{|\eta|}
+$$
+
+Where ${\eta} = \nabla | \omega |$. The resulting vector field, $\Psi$, consists of vectors that point towards the highest
+nearby vorticity concentration. We then use $\Psi$ with a confinement constant, $\epsilon$, to create an artificial
+force.
+
+$$
+f_{conf} = \epsilon (\Psi \times \omega)
+$$
+
+This force is then added to our velocity field to bring back the billowing effect of our fire and smoke.
+TODO: Site the nvidia paper and the paper number 9.
 
 ## Fire and Smoke
 
