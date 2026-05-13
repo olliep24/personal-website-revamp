@@ -257,7 +257,24 @@ T' = T - \sigma_{cool}(\frac{T}{T_{max}})^4 * \delta t
 $$
 
 The parameter $\sigma_{cool}$ is the rate of cooling. If desired, this can be tuned to physically accurate, but this simulation
-is already not physically accurate. Instead, I tuned the cooling rate to get the desired look through trial and error. 
+is already not physically accurate. Instead, I tuned the cooling rate to get the desired look through trial and error. Also note
+the implicit numerical dissipation from Semi-Lagrangian, which will combine with the Stefan-Boltzman law. 
+
+Other approaches opt to have a burn rate for the fuel. While this is more natural, the implicit numerical dissipation behaved well
+enough for my liking. 
+
+The visually simplest way to inject fuel into the simulation was as a fireball. Initially, fuel was injected as a 3D guassian
+distribution:
+
+$$
+\rho(\mathbf{x}) = \exp\!\left(-\frac{\|\mathbf{x} - \mathbf{c}\|^2}{2\sigma^2}\right), \quad \sigma = 0.35 \cdot r
+$$
+
+where $\mathbf{x}$ is the grid cell position, $\mathbf{c}$ is the center of the fireball,
+$r$ is the radius of the fireball, and $\sigma$ is the standard deviation controlling the spread. The raw Gaussian is
+then scaled by an injection rate and modulated by 3-octave FBM noise to break up the perfect symmetry and give the fireball a
+more organic shape.
+TODO: link FBM paper or wikipedia
 
 # Rendering and GPU Utilization
 
