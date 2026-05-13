@@ -236,6 +236,29 @@ TODO: Site the nvidia paper and the paper number 9.
 
 ## Fire and Smoke
 
+Now that we have stable fluid simulation, we are ready to simulate fire. As discussed earlier, scalar quantities can be
+advected by the fluid's velocity field. We will add fuel, temperature, and smoke scalar values to our simulation. The
+combination of these values will be used to simulate the behavior of the fire and render it. 
+
+To keep things simple, we will assume that fuel doesn't need to be ignited. If present, fuel will give off temperature
+proportional to the amount of fuel present. Let's define a scalar field $\rho$ where $0 \leq \rho \leq 1$ to represent the
+proportion of fuel at a given coordinate in our simulation grid. The scalar field $T$ where $0 \leq T \leq T_{max}$ will
+represent the temperature at a given coordinate in our simulation grid. At each timestep, the new temperature $T'$ will be:
+
+$$
+T' = \text{max}(T, p * T_{burn})
+$$
+
+Where $T_{burn}$ is the temperature at which the fuel burns. Temperature also dissipates naturally, which can be modeled via 
+Stefan-Boltzman Law:
+
+$$
+T' = T - \sigma_{cool}(\frac{T}{T_{max}})^4 * \delta t
+$$
+
+The parameter $\sigma_{cool}$ is the rate of cooling. If desired, this can be tuned to physically accurate, but this simulation
+is already not physically accurate. Instead, I tuned the cooling rate to get the desired look through trial and error. 
+
 # Rendering and GPU Utilization
 
 # Try it out!
