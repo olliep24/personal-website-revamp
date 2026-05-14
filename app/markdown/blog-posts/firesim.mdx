@@ -276,6 +276,37 @@ then scaled by an injection rate and modulated by 3-octave FBM noise to break up
 more organic shape.
 TODO: link FBM paper or wikipedia
 
+With temperature added to our simulation, it now needs to affect how the fluid moves. The hot fluid should rise, and the cooler
+fluid should fall. This is our buoyancy force:
+
+$$
+f_{buoyancy} = \beta T \delta t \textbf{j}
+$$
+
+Where $\beta$ is a parameter to tune the level of buoyancy and $\textbf{j}$ is the upward vector. This term is added to the
+external forces term of the Navier-Stokes equation, but in practice, it will also decay to prevent the simulation from fogging
+up completely.
+
+For smoke, let's define another scalar field $S$ where $0 \leq S \leq 1$. Smoke will also be generated from fuel. 
+
+$$
+S' = S \cdot (1 - \gamma)^{\delta t} + k_s \cdot \mathcal{S}(\rho;\, \rho_{th})
+$$
+
+where $\gamma$ is the smoke decay rate, $k_s$ is the smoke generation rate, $\rho_{th}$ is the minimum fuel level required to
+produce smoke, and $\mathcal{S}$ is the smoothstep function:
+
+$$
+\mathcal{S}(\rho;\, \rho_{th}) = t^2(3 - 2t), \qquad t = \text{clamp}\!\left(\frac{\rho - \rho_{th}}{1 - \rho_{th}},\, 0,\, 1\right)
+$$
+
+The smoothstep maps fuel density smoothly from zero at $\rho = \rho_{th}$ to one at $\rho = 1$, so only fuel above the threshold
+contributes smoke and the transition is $C^1$ continuous with no sharp edges. The threshold $\rho_{th}$ was necessary to prevent
+smoke from being generated at the outer edge of the fireball where fuel concentration is low, which would cause dark smoke to
+visually overpower the bright core of the fire.
+
+With these scalar values in place, we can now render the fire. 
+
 # Rendering and GPU Utilization
 
 # Try it out!
