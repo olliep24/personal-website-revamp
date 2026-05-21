@@ -310,6 +310,29 @@ With these scalar values in place, we can now render the fire.
 
 # Rendering and GPU Utilization
 
+## Rendering fire
+
+At room temperature, objects emit blackbody radiation in the infrared. As temperature rises above ~700K, emission shifts into the 
+visible spectrum, causing objects to glow — first red, then orange/yellow, then white-hot. Planck's Law describes the spectral density 
+of light radiated by a black body at a given temperature $T$:
+
+$$
+B(\lambda, T) = \frac{2hc^2}{\lambda^5} \cdot \frac{1}{e^{\,hc/(\lambda k_B T)} - 1}
+$$
+
+where $\lambda$ is the wavelength, $T$ is the temperature in Kelvin, $h$ is Planck's constant, $c$ is the speed of light,
+and $k_B$ is the Boltzmann constant.
+
+So at any point in our simulation, we can sample the temperature and get the approximate spectrum of radiation that point would emit.
+This spectrum is responsible for making our fire simulation glow. 
+
+We can use the CIE color matching curves to translate our spectrum to sRBG values. 
+
+TODO: Insert CIE color matching curves (maybe from the berkeley slides?)
+
+Luckily, the work of Wyman, Sloan, and Shirley
+in the Simple Analytic Approximations to the CIE XYZ Color Matching Functions allows us to translate efficiently.
+
 <Image src="/images/cpu_taming_gpu.png" width={800} height={600} alt="CPU taming the GPU" />
 
 # Try it out!
