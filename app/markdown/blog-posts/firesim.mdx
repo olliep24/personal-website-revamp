@@ -333,6 +333,17 @@ TODO: Insert CIE color matching curves (maybe from the berkeley slides?)
 Luckily, the work of Wyman, Sloan, and Shirley
 in the Simple Analytic Approximations to the CIE XYZ Color Matching Functions allows us to translate efficiently.
 
+Now that we have the ability to sample the color that the fire emits at any point in our simulation, we are now fully
+ready to start displaying the fire to the screen. A naive approach would be to take whatever color value that is closet 
+to the viewing perspective and render that on screen. This would show the body of the fire and how it moves, but it would lack
+the red to orange to yellow gradient iconic to fire because it would only be rendering the surface of the fire.
+
+Instead, we need to turn to volumetric rendering (TODO: Link wikipedia page). Specifically, ray marching will be 
+utilizied with beer-lambert's law. Rays are shot out from the camera's perspective, and they are iteratively marched a small distance. 
+At each iteration, the color of the simulation is sampled, which contributes a proportion of the ray's color. These samples 
+are added together to get the final color. This allows us to see the hot yellow inside of the fire because it contributes a 
+portion of the rendering color.
+
 <Image src="/images/cpu_taming_gpu.png" width={800} height={600} alt="CPU taming the GPU" />
 
 # Try it out!
