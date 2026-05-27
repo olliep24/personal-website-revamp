@@ -339,12 +339,44 @@ to the viewing perspective and render that on screen. This would show the body o
 the red to orange to yellow gradient iconic to fire because it would only be rendering the surface of the fire.
 
 Instead, we need to turn to volumetric rendering (TODO: Link wikipedia page). Specifically, ray marching will be 
-utilizied with beer-lambert's law. Rays are shot out from the camera's perspective, and they are iteratively marched a small distance. 
+utilized with beer-lambert's law. Rays are shot out from the camera's perspective, and they are iteratively marched a small distance. 
 At each iteration, the color of the simulation is sampled, which contributes a proportion of the ray's color. These samples 
 are added together to get the final color. This allows us to see the hot yellow inside of the fire because it contributes a 
 portion of the rendering color.
 
+## GPU Utilization
+
+As discussed earlier, the need for speed is vital to get a 3D fluid simulation to work in real time, and Utilizing the GPU
+is essential for this requirement. The GPU was an unfamiliar domain for my coding experience before this project. I had a 
+solid understanding of it's purpose, but it was always abstracted away from me in previous use cases. I never got to interface
+with it with shader programs before I did this project. I used a more traditional approach to using a GPU that I would like 
+to discuss, which had few benefits compared to the drawbacks. But, it was still a fun topic to dig into to. It has led me to 
+understand that using the GPU effectively is like taming a horse — the wrangling of race conditions, shader debugging, and 
+rethinking algorithms for parallelism is the fuss, but once harnessed, the power is undeniable.
+
 <Image src="/images/cpu_taming_gpu.png" width={800} height={600} alt="CPU taming the GPU" />
+
+### The Data Structure
+
+GPUs (Graphics Processing Unit) as their name suggests were created for graphic rendering. The problem was fundamentally
+parallelizable - every point in a scene can be treated independently of each other. This led their designs to be as parallel
+as possible, but as they were developed, they became coupled with graphics. The core pipeline was to to pass in the vertices
+of your objects to render, break those down into individual pieces called fragments in teh vertex shader, and then use the
+fragment shader to assign color to those fragments. A common use case is to apply a texture to these fragments, so textures
+became a common data structure in shader programs. From a fluid simulation perspective, these concepts do not map well, but
+we want to harness the parallel compute.
+
+Luckily, textures can be though of as a more traditional and familiar data structure - an array. Fundamentally, a texture
+is an array of RGBA values. They hold meaning when they are rendered to the screen when they display an image, but they don't 
+have to hold an image. Earlier, I discussed how the simulation is a grid based, and a grid is just an array with dimensions. 
+So, textures are used to represent the simulation, and the RGBA values hold properties of the fields. The 3D vector field has
+it's x, y, and z dimensions in the R, G, and B values respectively in the texture. Another texture holds the scalar values
+(fuel, temperature and smoke). With our data interface into the GPU, the shader programs can implement the equations of the
+simulation to manipulate how the vector field and scalars change at each timestep.
+
+### The Struggles of Shader Programs
+
+
 
 # Try it out!
 
