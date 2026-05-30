@@ -32,9 +32,8 @@ advects itself. This gives the fluid simulation the realistic look we're looking
 
 ## The Navier Stokes Equations
 
-The Navier Stokes Equations for incompressable flow describe how a fluid's vector field evolves over time at any given point.
+The Navier Stokes Equations for [incompressable flow](https://en.wikipedia.org/wiki/Incompressible_flow) describe how a fluid's vector field evolves over time at any given point.
 
-TODO: link imcompressible fluid above
 $$
 \frac{\partial \mathbf{u}}{\partial t} = -(\mathbf{u} \cdot \nabla)\mathbf{u} - \frac{1}{\rho}\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{f}
 \\
@@ -83,7 +82,8 @@ This term represents any forces outside the fluid that affect its velocity field
 ## Assumptions and Constraints
 
 As mentioned earlier, incompressibility, $\nabla \cdot \mathbf{u} = 0$, is applied to the simulation. Additionally, this simulation will
-be inviscid, $\nu = 0$, so we don't have to consider the diffusion term. This is a beneficial trade off as fire visually has no viscosity.   
+be inviscid, $\nu = 0$, so we don't have to consider the diffusion term. This is a beneficial trade off as fire doesn't visually behave
+like a viscous fluid.
 
 ## Semi-Lagrangian Advection
 
@@ -95,12 +95,12 @@ $$
 \mathbf{r}(t + \delta t) = \mathbf{r}(t) + \mathbf{u}(t) \delta t
 $$
 
-This approach is only stable in simulations with small timesteps, meaning the simulation will "blow up". Having a small timestamp
+This approach is only stable in simulations with small timesteps, meaning the simulation won't "blow up". Having a small timestamp
 is computationally expensive, which limits doing the simulation in real time. This presents another issue because we are utilizing
 the GPU with parallelization. A cell in our simulation grid will inevitably have two or more quantities converge on it,
 creating data races.
 
-The solution is to use a Semi-Lagrangian advection, an implicit method first introduce by Jos Stam in Stable Fluids, 1999. Instead,
+The solution is to use a Semi-Lagrangian advection, an implicit method first introduce by Jos Stam in Stable Fluids, 1999 [1]. Instead,
 we backtrace where a quantity would be given the velocity, and move that quantity to the current position. To update a quantity $q$
 for each timestep, we follow:
 
@@ -110,7 +110,9 @@ $$
 
 Where $q(\mathbf{x}, t)$ is the value of the quantity $q$ at position $\mathbf{x}$ at time $t$.
 
-TODO: Add nvidia picture here
+<Figure caption="Semi-Lagrangian Advection [4]">
+  <Image src="/images/semi_legrangian_advection.jpg" width={450} height={300} alt="Semi-Lagrangian Advection" />
+</Figure>
 
 This solution is stable with any timestep and is easily parallelizable on the GPU. Although, this solution adds dissipation to the
 simulation, but this will be readjusted with vorticity confinement later.
@@ -165,7 +167,7 @@ $$
 
 Applying the acceleration from the pressure term is exactly what is keeping the velocity field divergence free. Using the
 Helmholtz-Hodge decomposition theorem, we have discovered how to calculate pressure from the divergent velocity field and use it
-to create a divergence-free velocity field.
+to create a divergence-free velocity field [4].
 
 ## Solving Poisson Equations
 
@@ -197,7 +199,7 @@ $$
 
 We now have a linear equation with seven unknowns, but we want to solve for pressure at each of our $N^3$ grid locations. That
 leaves us with a system $N^3$ linear equations with $N^3$ unknowns because we want to solve for $i, j, k \in N^3$. It would take a
-lot of time to solve this system of linear equations exactly, so we can use the Jacobi method (which is well parallelized on the GPU) with $k=20$ iterations to find an
+lot of time to solve this system of linear equations exactly, so we can use the [Jacobi method](https://en.wikipedia.org/wiki/Jacobi_method) (which is well parallelized on the GPU) with $k=20$ iterations to find an
 approximate solution.
 
 We now fully have a way to calculate the change in our velocity field for a discrete time step in our simulation!
@@ -206,7 +208,7 @@ We now fully have a way to calculate the change in our velocity field for a disc
 
 Although we now have a stable simulation, we had to give up some things to achieve it. Smoke, air, or any gas you can think of
 has circular flows that spiral like pinwheels, which is referred to as vorticity. Fedkiw et al. explained how numerical 
-dissipation caused by simulation on a coarse grid damps out these interesting features. The process of adding these visualizations
+dissipation caused by simulation on a coarse grid damps out these interesting features [2]. The process of adding these visualizations
 back is referred to as vorticity confinement. To do so, we first calculate the vorticity of our field, $\omega = \nabla \times u$,
 and use that to normalized vorticity vector field:
 
@@ -222,10 +224,9 @@ $$
 f_{conf} = \epsilon (\Psi \times \omega)
 $$
 
-This force is then added to our velocity field to bring back the billowing effect of our fire and smoke.
-TODO: Site the nvidia paper and the paper number 9.
+This force is then added to our velocity field to bring back the billowing effect of our fire and smoke [4].
 
-## Fire and Smoke
+## Fire
 
 Now that we have stable fluid simulation, we are ready to simulate fire. As discussed earlier, scalar quantities can be
 advected by the fluid's velocity field. We will add fuel, temperature, and smoke scalar values to our simulation. The
@@ -241,15 +242,15 @@ T' = \text{max}(T, p * T_{burn})
 $$
 
 Where $T_{burn}$ is the temperature at which the fuel burns. Temperature also dissipates naturally, which can be modeled via 
-Stefan-Boltzman Law:
+[Stefan-Boltzman Law](https://en.wikipedia.org/wiki/Stefan%E2%80%93Boltzmann_law):
 
 $$
 T' = T - \sigma_{cool}(\frac{T}{T_{max}})^4 * \delta t
 $$
 
-The parameter $\sigma_{cool}$ is the rate of cooling. If desired, this can be tuned to physically accurate, but this simulation
+The parameter $\sigma_{cool}$ is the rate of cooling. If desired, this can be tuned to be physically accurate, but this simulation
 is already not physically accurate. Instead, I tuned the cooling rate to get the desired look through trial and error. Also note
-the implicit numerical dissipation from Semi-Lagrangian, which will combine with the Stefan-Boltzman law. 
+the implicit numerical dissipation from Semi-Lagrangian advection, which will combine with the dissipation from Stefan-Boltzman law. 
 
 Other approaches opt to have a burn rate for the fuel. While this is more natural, the implicit numerical dissipation behaved well
 enough for my liking. 
@@ -263,9 +264,8 @@ $$
 
 where $\mathbf{x}$ is the grid cell position, $\mathbf{c}$ is the center of the fireball,
 $r$ is the radius of the fireball, and $\sigma$ is the standard deviation controlling the spread. The raw Gaussian is
-then scaled by an injection rate and modulated by 3-octave FBM noise to break up the perfect symmetry and give the fireball a
+then scaled by an injection rate and modulated by [3-octave FBM noise](https://thebookofshaders.com/13/) to break up the perfect symmetry and give the fireball a
 more organic shape.
-TODO: link FBM paper or wikipedia
 
 With temperature added to our simulation, it now needs to affect how the fluid moves. The hot fluid should rise, and the cooler
 fluid should fall. This is our buoyancy force:
@@ -277,6 +277,8 @@ $$
 Where $\beta$ is a parameter to tune the level of buoyancy and $\textbf{j}$ is the upward vector. This term is added to the
 external forces term of the Navier-Stokes equation, but in practice, it will also decay to prevent the simulation from fogging
 up completely.
+
+## Smoke 
 
 For smoke, let's define another scalar field $S$ where $0 \leq S \leq 1$. Smoke will also be generated from fuel. 
 
@@ -292,7 +294,7 @@ $$
 $$
 
 The smoothstep maps fuel density smoothly from zero at $\rho = \rho_{th}$ to one at $\rho = 1$, so only fuel above the threshold
-contributes smoke and the transition is $C^1$ continuous with no sharp edges. The threshold $\rho_{th}$ was necessary to prevent
+contributes smoke. The threshold $\rho_{th}$ was necessary to prevent
 smoke from being generated at the outer edge of the fireball where fuel concentration is low, which would cause dark smoke to
 visually overpower the bright core of the fire.
 
@@ -303,7 +305,7 @@ With these scalar values in place, we can now render the fire.
 ## Rendering fire
 
 At room temperature, objects emit blackbody radiation in the infrared. As temperature rises above ~700K, emission shifts into the 
-visible spectrum, causing objects to glow — first red, then orange/yellow, then white-hot. Planck's Law describes the spectral density 
+visible spectrum, causing objects to glow — first red, then orange/yellow, then white-hot. [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) describes the spectral density 
 of light radiated by a black body at a given temperature $T$:
 
 $$
@@ -316,27 +318,29 @@ and $k_B$ is the Boltzmann constant.
 So at any point in our simulation, we can sample the temperature and get the approximate spectrum of radiation that point would emit.
 This spectrum is responsible for making our fire simulation glow. 
 
-We can use the CIE color matching curves to translate our spectrum to sRBG values. 
+We can use the [CIE color matching curves](https://en.wikipedia.org/wiki/CIE_1931_color_space) to translate our spectrum to sRBG values. 
 
-TODO: Insert CIE color matching curves (maybe from the berkeley slides?)
+<Figure caption="CIE Color Matching Curves [5]">
+  <Image src="/images/cie_color_matching_curves.png" width={450} height={300} alt="CIE Color Matching Curves" />
+</Figure>
 
-Luckily, the work of Wyman, Sloan, and Shirley
-in the Simple Analytic Approximations to the CIE XYZ Color Matching Functions allows us to translate efficiently.
+Luckily, the work of Wyman, Sloan, and Shirley in the Simple Analytic Approximations to the CIE XYZ Color Matching Functions allows 
+us to translate efficiently [5].
 
 Now that we have the ability to sample the color that the fire emits at any point in our simulation, we are now fully
 ready to start displaying the fire to the screen. A naive approach would be to take whatever color value that is closet 
 to the viewing perspective and render that on screen. This would show the body of the fire and how it moves, but it would lack
 the red to orange to yellow gradient iconic to fire because it would only be rendering the surface of the fire.
 
-Instead, we need to turn to volumetric rendering (TODO: Link wikipedia page). Specifically, ray marching will be 
-utilized with beer-lambert's law. Rays are shot out from the camera's perspective, and they are iteratively marched a small distance. 
+Instead, we need to turn to [volumetric rendering](https://en.wikipedia.org/wiki/Volume_rendering). Specifically, ray marching will be 
+utilized with [Beer-Lambert's law](https://en.wikipedia.org/wiki/Beer%E2%80%93Lambert_law). Rays are shot out from the camera's perspective, and they are iteratively marched a small distance. 
 At each iteration, the color of the simulation is sampled, which contributes a proportion of the ray's color. These samples 
-are added together to get the final color. This allows us to see the hot yellow inside of the fire because it contributes a 
-portion of the rendering color.
+are added together to get the final color. This allows us to see the hot yellow inside of the fire because every bit of the fire along
+the ray's path contributes to the color.
 
 ## GPU Utilization
 
-As discussed earlier, the need for speed is vital to get a 3D fluid simulation to work in real time, and Utilizing the GPU
+As discussed earlier, the need for speed is vital to get a 3D fluid simulation to work in real time, and utilizing the GPU
 is essential for this requirement. The GPU was an unfamiliar domain for my coding experience before this project. I had a 
 solid understanding of it's purpose, but it was always abstracted away from me in previous use cases. I never got to interface
 with it with shader programs before I did this project. I used a more traditional approach to using a GPU that I would like 
@@ -353,26 +357,26 @@ rethinking algorithms for parallelism is the fuss, but once harnessed, the power
 GPUs (Graphics Processing Unit) as their name suggests were created for graphic rendering. The problem was fundamentally
 parallelizable - every point in a scene can be treated independently of each other. This led their designs to be as parallel
 as possible, but as they were developed, they became coupled with graphics. The core pipeline was to to pass in the vertices
-of your objects to render, break those down into individual pieces called fragments in teh vertex shader, and then use the
+of your objects to render, break those down into individual pieces called fragments in the vertex shader, and then use the
 fragment shader to assign color to those fragments. A common use case is to apply a texture to these fragments, so textures
 became a common data structure in shader programs. From a fluid simulation perspective, these concepts do not map well, but
 we want to harness the parallel compute.
 
-Luckily, textures can be though of as a more traditional and familiar data structure - an array. Fundamentally, a texture
+Luckily, textures can be thought of as a more traditional and familiar data structure - an array. Fundamentally, a texture
 is an array of RGBA values. They hold meaning when they are rendered to the screen when they display an image, but they don't 
 have to hold an image. Earlier, I discussed how the simulation is a grid based, and a grid is just an array with dimensions. 
 So, textures are used to represent the simulation, and the RGBA values hold properties of the fields. The 3D vector field has
 it's x, y, and z dimensions in the R, G, and B values respectively in the texture. Another texture holds the scalar values
-(fuel, temperature and smoke). With our data interface into the GPU, the shader programs can implement the equations of the
+(fuel, temperature and smoke). With our interface into the GPU, the shader programs can implement the equations of the
 simulation to manipulate how the vector field and scalars change at each timestep.
 
 ### The Struggles of Shader Programs
 
-using textures as our data structure has its pros and cons. again, textures were originally made to apply images to objects in a 
+Using textures as our data structure has its pros and cons. Again, textures were originally made to apply images to objects in a 
 scene, so writing to them wasn't a main part of their design. it is still possible with some techniques. one main challenge is that
-wgsl doesn't allow the same texture to be read from and written to in the same compute pass. to get around this, two textures
-are used to represent the same values. on every compute pass, one texture is read from, and the other texture is written to. they
-then alternate for each time stamp of the simulation. this process is called ping-ponging, and we use a struct to track that state.
+WGSL doesn't allow the same texture to be read from and written to in the same compute pass. To get around this, two textures
+are used to represent the same values. on every compute pass, one texture is read from, and the other texture is written to. They
+then alternate for each time stamp of the simulation. This process is called ping-ponging, and we use a struct to track that state.
 
 ```rust
 pub struct pingpong {
@@ -382,19 +386,19 @@ pub struct pingpong {
 }
 ```
 
-alternatively, i could have explored compute shaders more (TODO: link something about compute shaders), which are specifically designed 
+Alternatively, I could have explored [compute shaders](https://sotrh.github.io/learn-wgpu/compute/introduction/#why-gpu-compute-is-fast) more, which are specifically designed 
 for utilizing the GPU outside of graphics. These would have allowed me to use plain arrays and write less shader programs.
-But following the (TODO: Add nvidia paper), I decided to follow a traditional approach for the sake of curiosity. 
+But following GPU Gems [4], I decided to follow a traditional approach for the sake of curiosity. 
 
 # Motivation
 
 I had this project idea in the back of my mind for about a year. When I was taking a computer graphics class at UC Berkeley,
 my final project group had to pick a topic, one of the topics being a fire simulation based off of Andrew Chan's fire simulation
-project. My group took a different direction, but I've always wanted to pursue this myself. Additionally, I admired Chan's way of
+project [6]. My group took a different direction, but I've always wanted to pursue this myself. Additionally, I admired Chan's way of
 presenting his work, which led to me to model my website off of his, build a project inspired from one of his own, and write a
 blog post about it following his style.
 
-I decided to use rust here simply because I wanted to develop my rust skills, but it came equipped with the wgpu crate, which had plenty of 
+I decided to use rust here simply because I wanted to develop my rust skills, but it came equipped with the [wgpu crate](https://docs.rs/wgpu/latest/wgpu/), which had plenty of 
 documentation to get started. Rust has a great wasm ecosystem as well, allowing me to show my simulation on this web page. Another one
 of my goals was to utilize the GPU and get some experience writing programs for it.
 
@@ -409,4 +413,6 @@ Press f to start the fire!
   2. Fedkiw, R., Stam, J., Jensen, H.W. *Visual Simulation of Smoke*. SIGGRAPH 2001.
   3. Wyman, C., Sloan, P., Shirley, P. *Simple Analytic Approximations to the CIE XYZ Color Matching Functions*. JCGT 2013.
   4. Harris, M. *Fast Fluid Dynamics Simulation on the GPU*. GPU Gems, Chapter 38. NVIDIA 2004.
+  5. [CIE 1931 Color Space](https://en.wikipedia.org/wiki/CIE_1931_color_space). Wikipedia.
+  6. Chan, A. [*Fire Simulation*](https://andrewkchan.dev/posts/fire.html). andrewkchan.dev.
 </References>
