@@ -40,7 +40,7 @@ $$
 \nabla \cdot \mathbf{u} = 0
 $$
 
-Although very imitating, this equation has been vastly simplified given our incompressability constraint, $\nabla \cdot \mathbf{u} = 0$,
+Although very intimidating, this equation has been vastly simplified given our incompressibility constraint, $\nabla \cdot \mathbf{u} = 0$,
 and we can connect each term to a physical concept.
 
 ### Advection
@@ -58,8 +58,8 @@ $$
 -\frac{1}{\rho}\nabla p
 $$
 
-Forces don't instantly propagate through a fluid. Each molecule close to the source of the force push on other molecules adjacent to
-them, and those particles push on other molecules adjacent to them, and so on. This is pressure build up and adds acceleration to the
+Forces don't instantly propagate through a fluid. Each molecule close to the source of the force pushes on other molecules adjacent to
+them, and those particles push on other molecules adjacent to them, and so on. This is pressure buildup and adds acceleration to the
 liquid. 
 
 ### Diffusion
@@ -100,7 +100,7 @@ is computationally expensive, which limits doing the simulation in real time. Th
 the GPU with parallelization. A cell in our simulation grid will inevitably have two or more quantities converge on it,
 creating data races.
 
-The solution is to use a Semi-Lagrangian advection, an implicit method first introduce by Jos Stam in Stable Fluids, 1999 [1]. Instead,
+The solution is to use a Semi-Lagrangian advection, an implicit method first introduced by Jos Stam in Stable Fluids, 1999 [1]. Instead,
 we backtrace where a quantity would be given the velocity, and move that quantity to the current position. To update a quantity $q$
 for each timestep, we follow:
 
@@ -123,8 +123,8 @@ Now that we have a discrete and parallelized method of advection, we now need to
 field. Applying forces is straightforward, so I don't feel the need to talk about it, but pressure presents another story.
 
 After applying advection and the external forces to our vector field for a discrete timestamp, we are left with a new vector field 
-$u'$. This field isn't guaranteed to incompressable (have zero divergence). Luckily, the Helmholtz-Hodge decomposition will be helpful
-transforming a non-zero divergence vector field to a divergence free vector field.
+$u'$. This field isn't guaranteed to be incompressible (have zero divergence). Luckily, the Helmholtz-Hodge decomposition will be helpful in
+transforming a non-zero divergence vector field to a divergence-free vector field.
 
 <Theorem name="Helmholtz-Hodge Decomposition">
   Any vector field $\mathbf{u'}$ on space $D$ with normal $\mathbf{n}$ can be uniquely decomposed into the form:
@@ -143,7 +143,7 @@ $$
 \mathbb{P}\frac{\partial \mathbf{u}}{\partial t} = \mathbb{P}(-(\mathbf{u} \cdot \nabla)\mathbf{u} - \frac{1}{\rho}\nabla p + \nu \nabla^2 \mathbf{u} + \mathbf{f})
 $$
 
-Because $u$ is divergence-free, so it the derivative on the left hand side, so $\mathbb{P}\frac{\partial \mathbf{u}}{\partial t} = \frac{\partial \mathbf{u}}{\partial t}$.
+Because $u$ is divergence-free, so is its derivative on the left hand side, so $\mathbb{P}\frac{\partial \mathbf{u}}{\partial t} = \frac{\partial \mathbf{u}}{\partial t}$.
 Additionally, $\mathbb{P}(\nabla p) = 0$, so we're left with:
 
 $$
@@ -210,7 +210,7 @@ Although we now have a stable simulation, we had to give up some things to achie
 has circular flows that spiral like pinwheels, which is referred to as vorticity. Fedkiw et al. explained how numerical 
 dissipation caused by simulation on a coarse grid damps out these interesting features [2]. The process of adding these visualizations
 back is referred to as vorticity confinement. To do so, we first calculate the vorticity of our field, $\omega = \nabla \times u$,
-and use that to normalized vorticity vector field:
+and use that to form a normalized vorticity vector field:
 
 $$
 \Psi = \frac{\eta}{|\eta|}
@@ -255,7 +255,7 @@ the implicit numerical dissipation from Semi-Lagrangian advection, which will co
 Other approaches opt to have a burn rate for the fuel. While this is more natural, the implicit numerical dissipation behaved well
 enough for my liking. 
 
-The visually simplest way to inject fuel into the simulation was as a fireball. Initially, fuel was injected as a 3D guassian
+The visually simplest way to inject fuel into the simulation was as a fireball. Initially, fuel was injected as a 3D Gaussian
 distribution:
 
 $$
@@ -318,7 +318,7 @@ and $k_B$ is the Boltzmann constant.
 So at any point in our simulation, we can sample the temperature and get the approximate spectrum of radiation that point would emit.
 This spectrum is responsible for making our fire simulation glow. 
 
-We can use the [CIE color matching curves](https://en.wikipedia.org/wiki/CIE_1931_color_space) to translate our spectrum to sRBG values. 
+We can use the [CIE color matching curves](https://en.wikipedia.org/wiki/CIE_1931_color_space) to translate our spectrum to sRGB values. 
 
 <Figure caption="CIE Color Matching Curves [5]">
   <Image src="/images/cie_color_matching_curves.png" width={450} height={300} alt="CIE Color Matching Curves" />
@@ -328,7 +328,7 @@ Luckily, the work of Wyman, Sloan, and Shirley in the Simple Analytic Approximat
 us to translate efficiently [5].
 
 Now that we have the ability to sample the color that the fire emits at any point in our simulation, we are now fully
-ready to start displaying the fire to the screen. A naive approach would be to take whatever color value that is closet 
+ready to start displaying the fire to the screen. A naive approach would be to take whatever color value is closest 
 to the viewing perspective and render that on screen. This would show the body of the fire and how it moves, but it would lack
 the red to orange to yellow gradient iconic to fire because it would only be rendering the surface of the fire.
 
@@ -342,9 +342,9 @@ the ray's path contributes to the color.
 
 As discussed earlier, the need for speed is vital to get a 3D fluid simulation to work in real time, and utilizing the GPU
 is essential for this requirement. The GPU was an unfamiliar domain for my coding experience before this project. I had a 
-solid understanding of it's purpose, but it was always abstracted away from me in previous use cases. I never got to interface
+solid understanding of its purpose, but it was always abstracted away from me in previous use cases. I never got to interface
 with it with shader programs before I did this project. I used a more traditional approach to using a GPU that I would like 
-to discuss, which had few benefits compared to the drawbacks. But, it was still a fun topic to dig into to. It has led me to 
+to discuss, which had few benefits compared to the drawbacks. But, it was still a fun topic to dig into. It has led me to 
 understand that using the GPU effectively is like taming a horse — the wrangling of race conditions, shader debugging, and 
 rethinking algorithms for parallelism is the fuss, but once harnessed, the power is undeniable.
 
@@ -356,7 +356,7 @@ rethinking algorithms for parallelism is the fuss, but once harnessed, the power
 
 GPUs (Graphics Processing Unit) as their name suggests were created for graphic rendering. The problem was fundamentally
 parallelizable - every point in a scene can be treated independently of each other. This led their designs to be as parallel
-as possible, but as they were developed, they became coupled with graphics. The core pipeline was to to pass in the vertices
+as possible, but as they were developed, they became coupled with graphics. The core pipeline was to pass in the vertices
 of your objects to render, break those down into individual pieces called fragments in the vertex shader, and then use the
 fragment shader to assign color to those fragments. A common use case is to apply a texture to these fragments, so textures
 became a common data structure in shader programs. From a fluid simulation perspective, these concepts do not map well, but
@@ -366,22 +366,22 @@ Luckily, textures can be thought of as a more traditional and familiar data stru
 is an array of RGBA values. They hold meaning when they are rendered to the screen when they display an image, but they don't 
 have to hold an image. Earlier, I discussed how the simulation is a grid based, and a grid is just an array with dimensions. 
 So, textures are used to represent the simulation, and the RGBA values hold properties of the fields. The 3D vector field has
-it's x, y, and z dimensions in the R, G, and B values respectively in the texture. Another texture holds the scalar values
+its x, y, and z dimensions in the R, G, and B values respectively in the texture. Another texture holds the scalar values
 (fuel, temperature and smoke). With our interface into the GPU, the shader programs can implement the equations of the
 simulation to manipulate how the vector field and scalars change at each timestep.
 
 ### The Struggles of Shader Programs
 
 Using textures as our data structure has its pros and cons. Again, textures were originally made to apply images to objects in a 
-scene, so writing to them wasn't a main part of their design. it is still possible with some techniques. one main challenge is that
+scene, so writing to them wasn't a main part of their design. It is still possible with some techniques. One main challenge is that
 WGSL doesn't allow the same texture to be read from and written to in the same compute pass. To get around this, two textures
-are used to represent the same values. on every compute pass, one texture is read from, and the other texture is written to. They
+are used to represent the same values. On every compute pass, one texture is read from, and the other texture is written to. They
 then alternate for each time stamp of the simulation. This process is called ping-ponging, and we use a struct to track that state.
 
 ```rust
-pub struct pingpong {
-  texture_a: texture,
-  texture_b: texture,
+pub struct PingPong {
+  texture_a: Texture,
+  texture_b: Texture,
   a_to_b: bool,
 }
 ```
