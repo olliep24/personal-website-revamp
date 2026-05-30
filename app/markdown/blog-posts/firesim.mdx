@@ -22,7 +22,9 @@ more.
 Grid based simulations model a velocity vector field, $\mathbf{u}(\mathbf{x}, t)$, at discrete grid locations. Each grid cell contains 
 a vector representing the direction and speed of the fluid at that point in the simulation space.
 
-Image from nvidia paper
+<Figure caption="Simulation grid showing velocity and scalar field layout [4].">
+  <Image src="/images/grid_sim.jpg" width={450} height={300} alt="Grid Simulation" />
+</Figure>
 
 Other scalar fields exist in our simulation like fuel, temperature, and smoke. These scalar fields are advected by the velocity field
 at each timestep of the simulation. Not only do these scalar quantities move through the vector field, but the vector field also 
@@ -342,7 +344,9 @@ to discuss, which had few benefits compared to the drawbacks. But, it was still 
 understand that using the GPU effectively is like taming a horse — the wrangling of race conditions, shader debugging, and 
 rethinking algorithms for parallelism is the fuss, but once harnessed, the power is undeniable.
 
-<Image src="/images/cpu_taming_gpu.png" width={800} height={600} alt="CPU taming the GPU" />
+<Figure>
+  <Image src="/images/cpu_taming_gpu.png" width={700} height={525} alt="CPU taming the GPU" />
+</Figure>
 
 ### The Data Structure
 
@@ -364,21 +368,21 @@ simulation to manipulate how the vector field and scalars change at each timeste
 
 ### The Struggles of Shader Programs
 
-Using textures as our data structure has its pros and cons. Again, textures were originally made to apply images to objects in a 
-scene, so writing to them wasn't a main part of their design. It is still possible with some techniques. One main challenge is that
-WGSL doesn't allow the same texture to be read from and written to in the same compute pass. To get around this, two textures
-are used to represent the same values. On every compute pass, one texture is read from, and the other texture is written to. They
-then alternate for each time stamp of the simulation. This process is called ping-ponging, and we use a rust struct to track that state.
+using textures as our data structure has its pros and cons. again, textures were originally made to apply images to objects in a 
+scene, so writing to them wasn't a main part of their design. it is still possible with some techniques. one main challenge is that
+wgsl doesn't allow the same texture to be read from and written to in the same compute pass. to get around this, two textures
+are used to represent the same values. on every compute pass, one texture is read from, and the other texture is written to. they
+then alternate for each time stamp of the simulation. this process is called ping-ponging, and we use a struct to track that state.
 
 ```rust
-pub struct PingPong {
-  texture_a: Texture,
-  texture_b: Texture,
+pub struct pingpong {
+  texture_a: texture,
+  texture_b: texture,
   a_to_b: bool,
 }
 ```
 
-Alternatively, I could have explored compute shaders more (TODO: link something about compute shaders), which are specifically designed 
+alternatively, i could have explored compute shaders more (TODO: link something about compute shaders), which are specifically designed 
 for utilizing the GPU outside of graphics. These would have allowed me to use plain arrays and write less shader programs.
 But following the (TODO: Add nvidia paper), I decided to follow a traditional approach for the sake of curiosity. 
 
@@ -404,4 +408,5 @@ Press f to start the fire!
   1. Stam, J. *Stable Fluids*. SIGGRAPH 1999.
   2. Fedkiw, R., Stam, J., Jensen, H.W. *Visual Simulation of Smoke*. SIGGRAPH 2001.
   3. Wyman, C., Sloan, P., Shirley, P. *Simple Analytic Approximations to the CIE XYZ Color Matching Functions*. JCGT 2013.
+  4. Harris, M. *Fast Fluid Dynamics Simulation on the GPU*. GPU Gems, Chapter 38. NVIDIA 2004.
 </References>
