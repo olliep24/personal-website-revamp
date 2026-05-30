@@ -7,17 +7,6 @@ date: "2026-03-28"
 import Firesim from '@/app/ui/firesim';
 import Image from 'next/image';
 
-# Motivation
-
-I had this project idea in the back of my mind for about a year. When I was taking a computer graphics class at UC Berkeley,
-my final project group had to pick a topic, one of the topics being a fire simulation based off of Andrew Chan's fire simulation
-project. My group took a different direction, but I've always wanted to pursue this myself. Additionally, I admired Chan's way of
-presenting his work, which led to me to model my website off of his, build a project inspired from one of his own, and write a
-blog post about it following his style.
-
-I decided to use rust here simply because I wanted to develop my rust skills, but it came equipped with the wgpu crate, which had plenty of 
-documentation to get started. Rust has a great wasm ecosystem as well, allowing me to show my simulation on this web page. Another one
-of my goals was to utilize the GPU and get some experience writing programs for it.
 
 # Simulation
 
@@ -376,12 +365,35 @@ simulation to manipulate how the vector field and scalars change at each timeste
 
 ### The Struggles of Shader Programs
 
-* Talk about how tricky it is to work with textures. 
-* talk about how there are compute shaders now.
-* talk about the ping ponging technique
-* the need to write a whole pipeline and set up multiple shaders
-* Talk about some more things.
-* Wrap it all up with something witty.
+Using textures as our data structure has its pros and cons. Again, textures were originally made to apply images to objects in a 
+scene, so writing to them wasn't a main part of their design. It is still possible with some techniques. One main challenge is that
+WGSL doesn't allow the same texture to be read from and written to in the same compute pass. To get around this, two textures
+are used to represent the same values. On every compute pass, one texture is read from, and the other texture is written to. They
+then alternate for each time stamp of the simulation. This process is called ping-ponging, and we use a rust struct to track that state.
+
+```rust
+pub struct PingPong {
+  texture_a: Texture,
+  texture_b: Texture,
+  a_to_b: bool,
+}
+```
+
+Alternatively, I could have explored compute shaders more (TODO: link something about compute shaders), which are specifically designed 
+for utilizing the GPU outside of graphics. These would have allowed me to use plain arrays and write less shader programs.
+But following the (TODO: Add nvidia paper), I decided to follow a traditional approach for the sake of curiosity. 
+
+# Motivation
+
+I had this project idea in the back of my mind for about a year. When I was taking a computer graphics class at UC Berkeley,
+my final project group had to pick a topic, one of the topics being a fire simulation based off of Andrew Chan's fire simulation
+project. My group took a different direction, but I've always wanted to pursue this myself. Additionally, I admired Chan's way of
+presenting his work, which led to me to model my website off of his, build a project inspired from one of his own, and write a
+blog post about it following his style.
+
+I decided to use rust here simply because I wanted to develop my rust skills, but it came equipped with the wgpu crate, which had plenty of 
+documentation to get started. Rust has a great wasm ecosystem as well, allowing me to show my simulation on this web page. Another one
+of my goals was to utilize the GPU and get some experience writing programs for it.
 
 # Try it out!
 
