@@ -4,8 +4,11 @@ title: "Building a Realtime 3D Fire Simulation"
 date: "2026-05-08"
 ---
 
-import Firesim from '@/app/ui/firesim';
 import Image from 'next/image';
+
+<Figure>
+  <Image src="/images/firesim.gif" width={600} height={450} alt="FireSim simulation" unoptimized />
+</Figure>
 
 # Simulation
 
@@ -399,14 +402,7 @@ presenting his work, which led to me to model my website off of his, build a pro
 blog post about it following his style.
 
 I decided to use rust here simply because I wanted to develop my rust skills, but it came equipped with the [wgpu crate](https://docs.rs/wgpu/latest/wgpu/), which had plenty of 
-documentation to get started. Rust has a great wasm ecosystem as well, allowing me to show my simulation on this web page. Another one
-of my goals was to utilize the GPU and get some experience writing programs for it.
-
-# Try it out!
-
-Press f to start the fire!
-
-<Firesim width="100%" height="70vh" />
+documentation to get started. Another one of my goals was to utilize the GPU and get some experience writing programs for it.
 
 <References>
   1. Stam, J. *Stable Fluids*. SIGGRAPH 1999.
